@@ -10,12 +10,9 @@ import os
 import jieba
 from numpy import *
 
-#配置utf-8的环境
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 def savefile(savepath,content): #保存至文件 
     fp = open(savepath,"wb")
+    content = bytes(content,encoding = "utf8")  
     fp.write(content)
     fp.close()
     
@@ -42,10 +39,13 @@ for mydir in catelist:
 for file_path in file_list:                      #遍历类别目录下文件
     fullname = class_path + file_path            #拼出文件名全路径
     content = readfile(fullname).strip()         #读取文件内容
+    print(type(content))
+    content = content.decode()
+    print(type(content))    
     content = content.replace("\r\n","").strip() #删除换行和多余空格
     content_seg = " ".join(jieba.cut(content))             #为文件内容分词
-    print content_seg # 不知为什么没有显示
+    print (content_seg) # 不知为什么没有显示
     savefile(seg_dir+file_path," ".join(content_seg))   #将处理后的文件保存到分词后语料目录 
 
-print "中文语料分词结束"  
+print ("中文语料分词结束")  
     
