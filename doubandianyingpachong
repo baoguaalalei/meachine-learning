@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan  2 21:59:06 2018
+
+@author: xuwenyan0527
+"""
+
+# -*- coding: utf-8 -*-
+
+import urllib
+from urllib import request
+from html.parser import HTMLParser
+
+
+class MovieParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)  # 调用父类的构造函数
+        self.movies = []  # 定义一个数组来储解析出来的电影
+
+    def handle_starttag(self, tag, attrs):  # 重载handle_starttag方法，这个方法就可以去解析li这个数据
+        def _attr(attrlist, attrname):  # 定义一个函数来解析这个属性
+            for attr in attrlist:  # 从属性列表里面取出对应列表的值
+                if attr[0] == attrname:  # 如果这个传进来的属性名称和这个要求的名称一样
+                    return attr[1]  # 返回属性值
+            return None
+       # 如果要爬取即将上映的电影时，data-category为upcoming
+        if tag == 'li' and _attr(attrs, 'data-title') and _attr(attrs, 'data-category') == 'nowplaying':
+            movie = {}
+
+            movie['title'] = _attr(attrs, 'data-title')  # 电影名称
+
+            movie['score'] = _attr(attrs, 'data-score')  # 电影分数
+
+            movie['director'] = _attr(attrs, 'data-director')  # 电影导演
+
+            movie['actors'] = _attr(attrs, 'data-actors')  # 电影演员
+
+            self.movies.append(movie)  # 提取出来后放到列表里面
+
+            print('%(title)s|%(score)s|%(director)s|%(actors)s' % movie)
+
+
+def nowplaying_movie(url):
+    #req = urllib.request.urlopen(url).read().decode("utf-8")
+    s = urllib.request.urlopen(url).read().decode("utf-8")
+
+    #s = urllib.urlopen(req)
+    paser = MovieParser()
+    paser.feed(s)
+    
+    return paser.movies
+
+
+url = 'https://movie.douban.com/cinema/nowplaying/beijing/'
+movies = nowplaying_movie(url)
